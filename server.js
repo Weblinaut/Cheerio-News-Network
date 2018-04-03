@@ -25,7 +25,7 @@ mongoose.connect("mongodb://localhost/week18Populater", {
 });
 
 
-app.get("/scrape", function(req, res) {
+app.post("/scrape", function(req, res) {
     axios.get("http://www.echojs.com/").then(function(response) {
         var $ = cheerio.load(response.data);
 
@@ -76,7 +76,7 @@ app.get("/articles/:id", function(req, res) {
 app.post("/articles/:id", function(req, res) {
     db.Note.create(req.body)
         .then(function(dbNote) {
-            return db.Article.findOneAndUpdate({ _id: req.params.id }, { note: dbNote._id }, { new: true });
+            return db.Article.update({ _id: req.params.id }, { $push: { notes: dbNote } });
         })
         .then(function(dbArticle) {
             res.json(dbArticle);
